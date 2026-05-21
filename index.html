@@ -150,11 +150,37 @@ const glowMat=new THREE.MeshBasicMaterial({color:0xf8d36a,transparent:true,opaci
 const gateGlow=new THREE.Mesh(new THREE.PlaneGeometry(5.6,5.1),glowMat);gateGlow.position.set(0,2.55,-37.65);add(gateGlow);
 const backGlow=new THREE.Mesh(new THREE.PlaneGeometry(5.6,5.1),glowMat);backGlow.position.set(0,2.55,37.65);backGlow.rotation.y=Math.PI;add(backGlow);
 }
+function buildInspiredArchitecture(halfW,ceilingH){
+const trimMat=new THREE.MeshStandardMaterial({map:textures.brushedMetal||null,color:0x8b9096,roughness:.36,metalness:.58});
+const baseMat=new THREE.MeshStandardMaterial({color:0xa9a59c,roughness:.82,metalness:.08});
+const panelMat=new THREE.MeshStandardMaterial({color:0xd9d6cf,roughness:.94,metalness:.02});
+const sideFloorMat=new THREE.MeshStandardMaterial({color:0x908d88,roughness:.72,metalness:.04});
+// 壁の角・柱・見切りを追加して、駅通路らしい立体感を強める。
+createBox(.16,.30,80,baseMat,-halfW+.08,.15,0,false);
+createBox(.16,.30,80,baseMat,halfW-.08,.15,0,false);
+createBox(.12,.12,80,trimMat,-halfW+.10,ceilingH-.16,0,false);
+createBox(.12,.12,80,trimMat,halfW-.10,ceilingH-.16,0,false);
+createPlane(.42,80,sideFloorMat,-halfW+.62,.03,0,-Math.PI/2);
+createPlane(.42,80,sideFloorMat,halfW-.62,.03,0,-Math.PI/2);
+for(const z of[-30,-18,-6,6,18,30]){
+  createBox(.18,4.15,2.9,panelMat,-halfW+.09,2.15,z,false);
+  createBox(.18,4.15,2.9,panelMat,halfW-.09,2.15,z,false);
+}
+for(const z of[-27,-9,9,27]){
+  createBox(halfW*2-.55,.10,.22,trimMat,0,ceilingH-1.75,z,false);
+  createBox(halfW*2-.65,.06,.08,baseMat,0,1.02,z,false);
+}
+// 出入口まわりの角を少し立体的にする。
+for(const sx of[-2.55,2.55]){
+  createBox(.22,5.05,.38,trimMat,sx,2.46,39.78,false);
+  createBox(.22,5.05,.38,trimMat,sx,2.46,-39.78,false);
+}
+}
 function showFirstTutorial(){if(gameData.tutorialShown)return;gameData.tutorialShown=true;saveGameData();showFlash('初回ヒント：異変なしなら奥へ。異変ありなら後ろへ戻ります。')}
-function buildMap(){clearMap();chooseAnomaly();$('floorNum').textContent=currentNumber;$('hudSmall').textContent=hasAnomaly?'何かが違うかもしれない':'普通の通路かもしれない';document.body.classList.toggle('anomaly',!!hasAnomaly);document.body.classList.toggle('horror',isHorrorAnomaly(anomaly));updateProgressUI();const ceilingH=6.8,halfW=8;ambient.color.setHex(0xffffff);ambient.intensity=.46;fog.color.setHex(0xa2a39d);fog.near=10;fog.far=62;camera.fov=isHorrorAnomaly(anomaly)?84:78;camera.updateProjectionMatrix();shakePower=0;horrorPulse=0;$('panicFlash').style.opacity='0';const matFloor=new THREE.MeshStandardMaterial({map:textures.floor,roughness:.34,metalness:.03,color:0xd6d3cc});const matWall=new THREE.MeshStandardMaterial({map:textures.wall,roughness:.9,color:0xe4e1d4});const matCeil=new THREE.MeshStandardMaterial({color:0x8f918d,roughness:.94});const matDoor=new THREE.MeshStandardMaterial({color:0x2b2b2b,roughness:.72,metalness:.05});const matFrame=new THREE.MeshStandardMaterial({color:0xb7b7ad,roughness:.45,metalness:.28});const matGlow=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:1.2});const matTactile=new THREE.MeshStandardMaterial({map:textures.tactile,roughness:.72,metalness:.02,color:0xf2c93f});
+function buildMap(){clearMap();chooseAnomaly();$('floorNum').textContent=currentNumber;$('hudSmall').textContent=hasAnomaly?'何かが違うかもしれない':'普通の通路かもしれない';document.body.classList.toggle('anomaly',!!hasAnomaly);document.body.classList.toggle('horror',isHorrorAnomaly(anomaly));updateProgressUI();const ceilingH=6.55,halfW=7.6;ambient.color.setHex(0xffffff);ambient.intensity=.46;fog.color.setHex(0xa2a39d);fog.near=10;fog.far=62;camera.fov=isHorrorAnomaly(anomaly)?84:78;camera.updateProjectionMatrix();shakePower=0;horrorPulse=0;$('panicFlash').style.opacity='0';const matFloor=new THREE.MeshStandardMaterial({map:textures.floor,roughness:.32,metalness:.05,color:0xd6d3cc});const matWall=new THREE.MeshStandardMaterial({map:textures.wall,roughness:.92,color:0xe1ddd5});const matCeil=new THREE.MeshStandardMaterial({color:0x8b8d89,roughness:.96});const matDoor=new THREE.MeshStandardMaterial({color:0x2b2b2b,roughness:.72,metalness:.05});const matFrame=new THREE.MeshStandardMaterial({color:0xb7b7ad,roughness:.45,metalness:.28});const matGlow=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:1.2});const matTactile=new THREE.MeshStandardMaterial({map:textures.tactile,roughness:.72,metalness:.02,color:0xf2c93f});
 createPlane(halfW*2,80,matFloor,0,0,0,-Math.PI/2);createPlane(halfW*2,80,matCeil,0,ceilingH,0,Math.PI/2);createPlane(80,ceilingH,matWall,-halfW,ceilingH/2,0,0,Math.PI/2);createPlane(80,ceilingH,matWall,halfW,ceilingH/2,0,0,-Math.PI/2);createPlane(16,ceilingH,matWall,0,ceilingH/2,40,0,Math.PI);createPlane(16,ceilingH,matWall,0,ceilingH/2,-40,0,0);
-createPlane(4.35,4.85,matDoor,0,2.43,39.94,0,Math.PI);createBox(4.8,.14,.12,matFrame,0,4.92,39.88,false);createBox(.14,4.95,.12,matFrame,-2.45,2.47,39.88,false);createBox(.14,4.95,.12,matFrame,2.45,2.47,39.88,false);createPlane(4.35,4.85,currentNumber>=8?matGlow:matDoor,0,2.43,-39.94,0,0);createBox(4.8,.14,.12,matFrame,0,4.92,-39.88,false);createBox(.14,4.95,.12,matFrame,-2.45,2.47,-39.88,false);createBox(.14,4.95,.12,matFrame,2.45,2.47,-39.88,false);createPlane(1.05,78,matTactile,0,.028,0,-Math.PI/2);createGuideMarkers(halfW,ceilingH);
-const lightColor=anomaly==='redLight'?0xff2626:0xfff2d8;const lightMat=new THREE.MeshStandardMaterial({color:0xf8f8f6,emissive:lightColor,emissiveIntensity:2.2,roughness:.28});const lampBodyMat=new THREE.MeshStandardMaterial({color:0xd7dbdd,roughness:.82,metalness:.08});const lampTrimMat=new THREE.MeshStandardMaterial({color:0x5e666f,roughness:.45,metalness:.55});const makeSubwayLamp=(x,z)=>{createBox(4.9,.22,1.18,lampBodyMat,x,ceilingH-.05,z,false);createBox(4.55,.08,.66,lightMat,x,ceilingH-.13,z,false);createBox(4.75,.05,.09,lampTrimMat,x,ceilingH-.12,z-.39,false);createBox(4.75,.05,.09,lampTrimMat,x,ceilingH-.12,z+.39,false);const p=new THREE.PointLight(lightColor,.96,36);p.position.set(x,ceilingH-.68,z);add(p)};for(let z=-30;z<=30;z+=15)makeSubwayLamp(0,z);if(anomaly==='redLight'){ambient.intensity=.32;fog.color.setHex(0x241010);shakePower=.006}
+createPlane(4.35,4.85,matDoor,0,2.43,39.94,0,Math.PI);createBox(4.8,.14,.12,matFrame,0,4.92,39.88,false);createBox(.14,4.95,.12,matFrame,-2.45,2.47,39.88,false);createBox(.14,4.95,.12,matFrame,2.45,2.47,39.88,false);createPlane(4.35,4.85,currentNumber>=8?matGlow:matDoor,0,2.43,-39.94,0,0);createBox(4.8,.14,.12,matFrame,0,4.92,-39.88,false);createBox(.14,4.95,.12,matFrame,-2.45,2.47,-39.88,false);createBox(.14,4.95,.12,matFrame,2.45,2.47,-39.88,false);createPlane(1.05,78,matTactile,0,.028,0,-Math.PI/2);createGuideMarkers(halfW,ceilingH);buildInspiredArchitecture(halfW,ceilingH);
+const lightColor=anomaly==='redLight'?0xff2626:0xfff3df;const lightMat=new THREE.MeshStandardMaterial({color:0xf8f8f6,emissive:lightColor,emissiveIntensity:2.2,roughness:.28});const lampBodyMat=new THREE.MeshStandardMaterial({color:0xd7dbdd,roughness:.82,metalness:.08});const lampTrimMat=new THREE.MeshStandardMaterial({color:0x5e666f,roughness:.45,metalness:.55});const makeSubwayLamp=(x,z)=>{createBox(4.9,.22,1.18,lampBodyMat,x,ceilingH-.05,z,false);createBox(4.55,.08,.66,lightMat,x,ceilingH-.13,z,false);createBox(4.75,.05,.09,lampTrimMat,x,ceilingH-.12,z-.39,false);createBox(4.75,.05,.09,lampTrimMat,x,ceilingH-.12,z+.39,false);const p=new THREE.PointLight(lightColor,1.04,38);p.position.set(x,ceilingH-.68,z);add(p)};for(let z=-30;z<=30;z+=15)makeSubwayLamp(0,z);if(anomaly==='redLight'){ambient.intensity=.32;fog.color.setHex(0x241010);shakePower=.006}
 if(anomaly==='tileManChase')buildTileManDisguise(ceilingH);
 buildStationDetails(halfW,ceilingH);buildRealSecurityCameras(halfW,ceilingH);buildPosters(halfW);buildProps(halfW);buildExtraAnomalies(halfW,ceilingH);buildOldMan(ceilingH);if(isHorrorAnomaly(anomaly)){ambient.intensity=Math.min(ambient.intensity,.24);fog.color.setHex(0x181514);fog.near=5;fog.far=38;shakePower=.008}let signText=currentNumber>=8?'出口 EXIT':'第 '+currentNumber+' 通路';if(anomaly==='wrongSign')signText=currentNumber>=8?'入口 ENTRANCE':'第 '+(currentNumber+1)+' 通路';if(anomaly!=='missingSign'){const signMat=currentNumber>=8?makeTextMaterial(signText,'#14633d','#ffffff','#e6f3ea'):makeTextMaterial(signText,'#17355d','#f7fbff','#e7edf3');const sign=new THREE.Mesh(new THREE.PlaneGeometry(4.8,2.25),signMat);sign.position.set(-halfW+.04,ceilingH-2.2,13);sign.rotation.y=Math.PI/2;add(sign)}camera.position.set(0,3.2,34);input.yaw=0;input.pitch=0;applyCameraRotation()}
 function buildStationDetails(halfW,ceilingH){
@@ -165,9 +191,9 @@ const signPanelMat=new THREE.MeshStandardMaterial({color:0xd9d9d4,roughness:.82}
 // 通路をきれいにするため、天井の細かい板・手すり・ベンチ・自販機・消火器などは削除。
 // 必要な案内だけ壁に薄く配置する。
 for(let z=-30;z<=30;z+=20)createBox(15.5,.035,.055,panelMat,0,ceilingH-.02,z,false);
-const ad=new THREE.Mesh(new THREE.PlaneGeometry(5.0,2.0),adMat);ad.position.set(halfW-.045,3.45,-8);ad.rotation.y=-Math.PI/2;add(ad);
+const ad=new THREE.Mesh(new THREE.PlaneGeometry(4.7,1.95),adMat);ad.position.set(halfW-.045,3.45,-10);ad.rotation.y=-Math.PI/2;add(ad);
 const routeMap=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),new THREE.MeshStandardMaterial({map:textures.routeMap,roughness:.42}));routeMap.position.set(-halfW+.05,3.85,-24);routeMap.rotation.y=Math.PI/2;add(routeMap);
-const fareBoard=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),new THREE.MeshStandardMaterial({map:textures.fareBoard,roughness:.42}));fareBoard.position.set(halfW-.05,3.85,14);fareBoard.rotation.y=-Math.PI/2;add(fareBoard);
+const fareBoard=new THREE.Mesh(new THREE.PlaneGeometry(4.2,2.1),new THREE.MeshStandardMaterial({map:textures.fareBoard,roughness:.42}));fareBoard.position.set(halfW-.05,3.82,12);fareBoard.rotation.y=-Math.PI/2;add(fareBoard);
 const exitNotice=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.25),new THREE.MeshStandardMaterial({map:textures.exitNotice,roughness:.42}));exitNotice.position.set(-halfW+.052,4.62,28);exitNotice.rotation.y=Math.PI/2;add(exitNotice);
 const cctvNotice=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.1),new THREE.MeshStandardMaterial({map:textures.cctvNotice,roughness:.42}));cctvNotice.position.set(halfW-.052,4.45,-18);cctvNotice.rotation.y=-Math.PI/2;add(cctvNotice);
 // 時計は見やすい壁オブジェクトとして残す。棒状パーツは使わない。
@@ -254,12 +280,12 @@ function makeFireExtinguisher(x,z,rot){
   return addGroup(g);
 }
 // 右壁・左壁に密着。中央の x=-4.8〜4.8 付近には置かない。
-makeBench(halfW-.62,20.5,-Math.PI/2);
-makeBench(-halfW+.62,-12.5,Math.PI/2);
-makeVending(halfW-.38,-23.5,-Math.PI/2);
-makeFireExtinguisher(-halfW+.23,9.5,Math.PI/2);
-makeCone(halfW-.62,4.4,-Math.PI/2);
-if(!low)makeCone(halfW-.62,6.0,-Math.PI/2);
+makeBench(halfW-.68,18.5,-Math.PI/2);
+makeBench(-halfW+.68,-16.5,Math.PI/2);
+makeVending(halfW-.42,-24.0,-Math.PI/2);
+makeFireExtinguisher(-halfW+.24,7.5,Math.PI/2);
+makeCone(halfW-.68,3.8,-Math.PI/2);
+if(!low)makeCone(halfW-.68,5.3,-Math.PI/2);
 }
 function buildExtraAnomalies(halfW,ceilingH){
 if(anomaly==='floorArrow'){const redMat=new THREE.MeshBasicMaterial({color:0x8b0000,transparent:true,opacity:.82});const arrow=new THREE.Group();const shaft=new THREE.Mesh(new THREE.PlaneGeometry(1,6),redMat);shaft.rotation.x=-Math.PI/2;shaft.position.z=1.5;arrow.add(shaft);const head=new THREE.Mesh(new THREE.CircleGeometry(1.25,3),redMat);head.rotation.x=-Math.PI/2;head.rotation.z=Math.PI;head.position.z=5;arrow.add(head);arrow.position.set(0,.06,-7);add(arrow)}
